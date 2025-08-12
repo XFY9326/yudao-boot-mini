@@ -37,6 +37,35 @@ public class ApiSignatureAspect {
 
     private final ApiSignatureRedisDAO signatureRedisDAO;
 
+    /**
+     * 获取请求头加签参数 Map
+     *
+     * @param request   请求
+     * @param signature 签名注解
+     * @return signature params
+     */
+    private static SortedMap<String, String> getRequestHeaderMap(ApiSignature signature, HttpServletRequest request) {
+        SortedMap<String, String> sortedMap = new TreeMap<>();
+        sortedMap.put(signature.appId(), request.getHeader(signature.appId()));
+        sortedMap.put(signature.timestamp(), request.getHeader(signature.timestamp()));
+        sortedMap.put(signature.nonce(), request.getHeader(signature.nonce()));
+        return sortedMap;
+    }
+
+    /**
+     * 获取请求参数 Map
+     *
+     * @param request 请求
+     * @return queryParams
+     */
+    private static SortedMap<String, String> getRequestParameterMap(HttpServletRequest request) {
+        SortedMap<String, String> sortedMap = new TreeMap<>();
+        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+            sortedMap.put(entry.getKey(), entry.getValue()[0]);
+        }
+        return sortedMap;
+    }
+
     @Before("@annotation(signature)")
     public void beforePointCut(JoinPoint joinPoint, ApiSignature signature) {
         // 1. 验证通过，直接结束
@@ -140,35 +169,6 @@ public class ApiSignatureAspect {
                 + requestBody
                 + MapUtil.join(headerMap, "&", "=")
                 + appSecret;
-    }
-
-    /**
-     * 获取请求头加签参数 Map
-     *
-     * @param request   请求
-     * @param signature 签名注解
-     * @return signature params
-     */
-    private static SortedMap<String, String> getRequestHeaderMap(ApiSignature signature, HttpServletRequest request) {
-        SortedMap<String, String> sortedMap = new TreeMap<>();
-        sortedMap.put(signature.appId(), request.getHeader(signature.appId()));
-        sortedMap.put(signature.timestamp(), request.getHeader(signature.timestamp()));
-        sortedMap.put(signature.nonce(), request.getHeader(signature.nonce()));
-        return sortedMap;
-    }
-
-    /**
-     * 获取请求参数 Map
-     *
-     * @param request 请求
-     * @return queryParams
-     */
-    private static SortedMap<String, String> getRequestParameterMap(HttpServletRequest request) {
-        SortedMap<String, String> sortedMap = new TreeMap<>();
-        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-            sortedMap.put(entry.getKey(), entry.getValue()[0]);
-        }
-        return sortedMap;
     }
 
 }

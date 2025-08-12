@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apiaccesslog;
 
+import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
+import cn.idev.excel.annotation.ExcelProperty;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
-import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
-import cn.idev.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -26,11 +26,6 @@ public class ApiAccessLogRespVO {
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
     @ExcelProperty("用户编号")
     private Long userId;
-
-    @Schema(description = "用户类型，参见 UserTypeEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty(value = "用户类型", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.USER_TYPE)
-    private Integer userType;
 
     @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "dashboard")
     @ExcelProperty("应用名")

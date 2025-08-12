@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.system.service.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthRegisterReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportExcelVO;
@@ -34,14 +33,6 @@ public interface AdminUserService {
     Long createUser(@Valid UserSaveReqVO createReqVO);
 
     /**
-     * 注册用户
-     *
-     * @param registerReqVO 用户信息
-     * @return 用户编号
-     */
-    Long registerUser(@Valid AuthRegisterReqVO registerReqVO);
-
-    /**
      * 修改用户
      *
      * @param updateReqVO 用户信息
@@ -51,7 +42,7 @@ public interface AdminUserService {
     /**
      * 更新用户的最后登陆信息
      *
-     * @param id 用户编号
+     * @param id      用户编号
      * @param loginIp 登陆 IP
      */
     void updateUserLogin(Long id, String loginIp);
@@ -59,7 +50,7 @@ public interface AdminUserService {
     /**
      * 修改用户个人信息
      *
-     * @param id 用户编号
+     * @param id    用户编号
      * @param reqVO 用户个人信息
      */
     void updateUserProfile(Long id, @Valid UserProfileUpdateReqVO reqVO);
@@ -67,7 +58,7 @@ public interface AdminUserService {
     /**
      * 修改用户个人密码
      *
-     * @param id 用户编号
+     * @param id    用户编号
      * @param reqVO 更新用户个人密码
      */
     void updateUserPassword(Long id, @Valid UserProfileUpdatePasswordReqVO reqVO);
@@ -208,7 +199,7 @@ public interface AdminUserService {
     /**
      * 判断密码是否匹配
      *
-     * @param rawPassword 未加密的密码
+     * @param rawPassword     未加密的密码
      * @param encodedPassword 加密后的密码
      * @return 是否匹配
      */

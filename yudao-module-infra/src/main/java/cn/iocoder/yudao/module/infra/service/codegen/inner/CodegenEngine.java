@@ -51,7 +51,7 @@ import static cn.hutool.core.text.CharSequenceUtil.*;
 /**
  * 代码生成的引擎，用于具体生成代码
  * 目前基于 {@link org.apache.velocity.app.Velocity} 模板引擎实现
- *
+ * <p>
  * 考虑到 Java 模板引擎的框架非常多，Freemarker、Velocity、Thymeleaf 等等，所以我们采用 hutool 封装的 {@link cn.hutool.extra.template.Template} 抽象
  *
  * @author 芋道源码
@@ -61,7 +61,7 @@ public class CodegenEngine {
 
     /**
      * 后端的模板配置
-     *
+     * <p>
      * key：模板在 resources 的地址
      * value：生成的路径
      */
@@ -97,7 +97,7 @@ public class CodegenEngine {
 
     /**
      * 后端的配置模版
-     *
+     * <p>
      * key1：UI 模版的类型 {@link CodegenFrontTypeEnum#getType()}
      * key2：模板在 resources 的地址
      * value：生成的路径
@@ -219,28 +219,6 @@ public class CodegenEngine {
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_GENERAL.getType(), vue3Vben5EpGeneralTemplatePath("views/modules/list_sub_erp.vue"),  // 特殊：主子表专属逻辑
                     vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             .build();
-
-    @Resource
-    private CodegenProperties codegenProperties;
-
-    /**
-     * 是否使用 jakarta 包，用于解决 Spring Boot 2.X 和 3.X 的兼容性问题
-     *
-     * true  - 使用 jakarta.validation.constraints.*
-     * false - 使用 javax.validation.constraints.*
-     */
-    @Setter // 允许设置的原因，是因为单测需要手动改变
-    private Boolean jakartaEnable;
-
-    /**
-     * 是否为 yudao-cloud 项目，用于解决 Boot 和 Cloud 的 api 模块兼容性问题
-     *
-     * true  - 需要有 yudao-module-xxx-api 模块
-     * false - 不需要有，使用 api、enum 包即可
-     */
-    @Setter
-    private Boolean cloudEnable;
-
     /**
      * 模板引擎，由 hutool 实现
      */
@@ -249,6 +227,24 @@ public class CodegenEngine {
      * 全局通用变量映射
      */
     private final Map<String, Object> globalBindingMap = new HashMap<>();
+    @Resource
+    private CodegenProperties codegenProperties;
+    /**
+     * 是否使用 jakarta 包，用于解决 Spring Boot 2.X 和 3.X 的兼容性问题
+     * <p>
+     * true  - 使用 jakarta.validation.constraints.*
+     * false - 使用 javax.validation.constraints.*
+     */
+    @Setter // 允许设置的原因，是因为单测需要手动改变
+    private Boolean jakartaEnable;
+    /**
+     * 是否为 yudao-cloud 项目，用于解决 Boot 和 Cloud 的 api 模块兼容性问题
+     * <p>
+     * true  - 需要有 yudao-module-xxx-api 模块
+     * false - 不需要有，使用 api、enum 包即可
+     */
+    @Setter
+    private Boolean cloudEnable;
 
     public CodegenEngine() {
         // 初始化 TemplateEngine 属性
@@ -261,6 +257,99 @@ public class CodegenEngine {
         // 设置 cloudEnable，按照是否使用 Spring Cloud 来判断
         this.cloudEnable = ClassUtils.isPresent("cn.iocoder.yudao.module.infra.framework.rpc.config.RpcConfiguration",
                 ClassUtils.getDefaultClassLoader());
+    }
+
+    private static String javaTemplatePath(String path) {
+        return "codegen/java/" + path + ".vm";
+    }
+
+    private static String javaModuleImplVOFilePath(String path) {
+        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
+                "vo/${sceneEnum.prefixClass}${table.className}" + path, "server", "main");
+    }
+
+    private static String javaModuleImplControllerFilePath() {
+        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
+                "${sceneEnum.prefixClass}${table.className}Controller", "server", "main");
+    }
+
+    private static String javaModuleImplMainFilePath(String path) {
+        return javaModuleFilePath(path, "server", "main");
+    }
+
+    private static String javaModuleApiMainFilePath(String path) {
+        return javaModuleFilePath(path, "api", "main");
+    }
+
+    private static String javaModuleImplTestFilePath(String path) {
+        return javaModuleFilePath(path, "server", "test");
+    }
+
+    private static String javaModuleFilePath(String path, String module, String src) {
+        return "yudao-module-${table.moduleName}/" + // 顶级模块
+                "yudao-module-${table.moduleName}-" + module + "/" + // 子模块
+                "src/" + src + "/java/${basePackage}/module/${table.moduleName}/" + path + ".java";
+    }
+
+    private static String mapperXmlFilePath() {
+        return "yudao-module-${table.moduleName}/" + // 顶级模块
+                "yudao-module-${table.moduleName}-server/" + // 子模块
+                "src/main/resources/mapper/${table.businessName}/${table.className}Mapper.xml";
+    }
+
+    private static String vueTemplatePath(String path) {
+        return "codegen/vue/" + path + ".vm";
+    }
+
+    private static String vueFilePath(String path) {
+        return "yudao-ui-${sceneEnum.basePackage}-vue2/" + // 顶级目录
+                "src/" + path;
+    }
+
+    private static String vue3TemplatePath(String path) {
+        return "codegen/vue3/" + path + ".vm";
+    }
+
+    private static String vue3FilePath(String path) {
+        return "yudao-ui-${sceneEnum.basePackage}-vue3/" + // 顶级目录
+                "src/" + path;
+    }
+
+    private static String vue3VbenFilePath(String path) {
+        return "yudao-ui-${sceneEnum.basePackage}-vben/" + // 顶级目录
+                "src/" + path;
+    }
+
+    private static String vue3VbenTemplatePath(String path) {
+        return "codegen/vue3_vben/" + path + ".vm";
+    }
+
+    private static String vue3Vben5AntdSchemaTemplatePath(String path) {
+        return "codegen/vue3_vben5_antd/schema/" + path + ".vm";
+    }
+
+    private static String vue3Vben5AntdGeneralTemplatePath(String path) {
+        return "codegen/vue3_vben5_antd/general/" + path + ".vm";
+    }
+
+    private static String vue3Vben5EpSchemaTemplatePath(String path) {
+        return "codegen/vue3_vben5_ele/schema/" + path + ".vm";
+    }
+
+    private static String vue3Vben5EpGeneralTemplatePath(String path) {
+        return "codegen/vue3_vben5_ele/general/" + path + ".vm";
+    }
+
+    private static boolean isSubTemplate(String path) {
+        return path.contains("_sub");
+    }
+
+    private static boolean isPageReqVOTemplate(String path) {
+        return path.contains("pageReqVO");
+    }
+
+    private static boolean isListReqVOTemplate(String path) {
+        return path.contains("listReqVO");
     }
 
     @PostConstruct
@@ -378,7 +467,7 @@ public class CodegenEngine {
 
     /**
      * 格式化生成后的代码
-     *
+     * <p>
      * 因为尽量让 vm 模版简单，所以统一的处理都在这个方法。
      * 如果不处理，Vue 的 Pretty 格式校验可能会报错
      *
@@ -556,99 +645,6 @@ public class CodegenEngine {
                     ((List<String>) bindingMap.get("subSimpleClassName_strikeCases")).get(subIndex));
         }
         return filePath;
-    }
-
-    private static String javaTemplatePath(String path) {
-        return "codegen/java/" + path + ".vm";
-    }
-
-    private static String javaModuleImplVOFilePath(String path) {
-        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
-                "vo/${sceneEnum.prefixClass}${table.className}" + path, "server", "main");
-    }
-
-    private static String javaModuleImplControllerFilePath() {
-        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
-                "${sceneEnum.prefixClass}${table.className}Controller", "server", "main");
-    }
-
-    private static String javaModuleImplMainFilePath(String path) {
-        return javaModuleFilePath(path, "server", "main");
-    }
-
-    private static String javaModuleApiMainFilePath(String path) {
-        return javaModuleFilePath(path, "api", "main");
-    }
-
-    private static String javaModuleImplTestFilePath(String path) {
-        return javaModuleFilePath(path, "server", "test");
-    }
-
-    private static String javaModuleFilePath(String path, String module, String src) {
-        return "yudao-module-${table.moduleName}/" + // 顶级模块
-                "yudao-module-${table.moduleName}-" + module + "/" + // 子模块
-                "src/" + src + "/java/${basePackage}/module/${table.moduleName}/" + path + ".java";
-    }
-
-    private static String mapperXmlFilePath() {
-        return "yudao-module-${table.moduleName}/" + // 顶级模块
-                "yudao-module-${table.moduleName}-server/" + // 子模块
-                "src/main/resources/mapper/${table.businessName}/${table.className}Mapper.xml";
-    }
-
-    private static String vueTemplatePath(String path) {
-        return "codegen/vue/" + path + ".vm";
-    }
-
-    private static String vueFilePath(String path) {
-        return "yudao-ui-${sceneEnum.basePackage}-vue2/" + // 顶级目录
-                "src/" + path;
-    }
-
-    private static String vue3TemplatePath(String path) {
-        return "codegen/vue3/" + path + ".vm";
-    }
-
-    private static String vue3FilePath(String path) {
-        return "yudao-ui-${sceneEnum.basePackage}-vue3/" + // 顶级目录
-                "src/" + path;
-    }
-
-    private static String vue3VbenFilePath(String path) {
-        return "yudao-ui-${sceneEnum.basePackage}-vben/" + // 顶级目录
-                "src/" + path;
-    }
-
-    private static String vue3VbenTemplatePath(String path) {
-        return "codegen/vue3_vben/" + path + ".vm";
-    }
-
-    private static String vue3Vben5AntdSchemaTemplatePath(String path) {
-        return "codegen/vue3_vben5_antd/schema/" + path + ".vm";
-    }
-
-    private static String vue3Vben5AntdGeneralTemplatePath(String path) {
-        return "codegen/vue3_vben5_antd/general/" + path + ".vm";
-    }
-
-    private static String vue3Vben5EpSchemaTemplatePath(String path) {
-        return "codegen/vue3_vben5_ele/schema/" + path + ".vm";
-    }
-
-    private static String vue3Vben5EpGeneralTemplatePath(String path) {
-        return "codegen/vue3_vben5_ele/general/" + path + ".vm";
-    }
-
-    private static boolean isSubTemplate(String path) {
-        return path.contains("_sub");
-    }
-
-    private static boolean isPageReqVOTemplate(String path) {
-        return path.contains("pageReqVO");
-    }
-
-    private static boolean isListReqVOTemplate(String path) {
-        return path.contains("listReqVO");
     }
 
 }

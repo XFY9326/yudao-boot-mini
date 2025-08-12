@@ -105,7 +105,7 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
     /**
      * 生成动态的预签名上传 URL
      *
-     * @param path     相对路径
+     * @param path       相对路径
      * @param expiration 过期时间
      * @return 生成的上传 URL
      */

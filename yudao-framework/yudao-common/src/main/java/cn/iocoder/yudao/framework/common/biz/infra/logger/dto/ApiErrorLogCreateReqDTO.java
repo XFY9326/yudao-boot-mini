@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.framework.common.biz.infra.logger.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -21,10 +21,6 @@ public class ApiErrorLogCreateReqDTO {
      * 账号编号
      */
     private Long userId;
-    /**
-     * 用户类型
-     */
-    private Integer userType;
     /**
      * 应用名
      */

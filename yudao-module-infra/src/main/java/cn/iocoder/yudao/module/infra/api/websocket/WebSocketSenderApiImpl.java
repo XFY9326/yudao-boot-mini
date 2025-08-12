@@ -17,13 +17,13 @@ public class WebSocketSenderApiImpl implements WebSocketSenderApi {
     private WebSocketMessageSender webSocketMessageSender;
 
     @Override
-    public void send(Integer userType, Long userId, String messageType, String messageContent) {
-        webSocketMessageSender.send(userType, userId, messageType, messageContent);
+    public void send(Long userId, String messageType, String messageContent) {
+        webSocketMessageSender.send(userId, messageType, messageContent);
     }
 
     @Override
-    public void send(Integer userType, String messageType, String messageContent) {
-        webSocketMessageSender.send(userType, messageType, messageContent);
+    public void send(String messageType, String messageContent) {
+        webSocketMessageSender.send(messageType, messageContent);
     }
 
     @Override

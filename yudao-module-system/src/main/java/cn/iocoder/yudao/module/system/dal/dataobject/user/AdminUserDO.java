@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.user;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -26,7 +26,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminUserDO extends TenantBaseDO {
+public class AdminUserDO extends BaseDO {
 
     /**
      * 用户ID
@@ -39,7 +39,7 @@ public class AdminUserDO extends TenantBaseDO {
     private String username;
     /**
      * 加密后的密码
-     *
+     * <p>
      * 因为目前使用 {@link BCryptPasswordEncoder} 加密器，所以无需自己处理 salt 盐
      */
     private String password;
@@ -70,7 +70,7 @@ public class AdminUserDO extends TenantBaseDO {
     private String mobile;
     /**
      * 用户性别
-     *
+     * <p>
      * 枚举类 {@link SexEnum}
      */
     private Integer sex;
@@ -80,7 +80,7 @@ public class AdminUserDO extends TenantBaseDO {
     private String avatar;
     /**
      * 帐号状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

@@ -22,10 +22,6 @@ public class ApiAccessLogCreateReqDTO {
      */
     private Long userId;
     /**
-     * 用户类型
-     */
-    private Integer userType;
-    /**
      * 应用名
      */
     @NotNull(message = "应用名不能为空")
@@ -70,7 +66,7 @@ public class ApiAccessLogCreateReqDTO {
     private String operateName;
     /**
      * 操作分类
-     *
+     * <p>
      * 枚举，参见 OperateTypeEnum 类
      */
     private Integer operateType;

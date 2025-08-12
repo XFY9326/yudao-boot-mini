@@ -27,30 +27,29 @@ public abstract class AbstractWebSocketMessageSender implements WebSocketMessage
     private final WebSocketSessionManager sessionManager;
 
     @Override
-    public void send(Integer userType, Long userId, String messageType, String messageContent) {
-        send(null, userType, userId, messageType, messageContent);
+    public void send(Long userId, String messageType, String messageContent) {
+        send(null, userId, messageType, messageContent);
     }
 
     @Override
-    public void send(Integer userType, String messageType, String messageContent) {
-        send(null, userType, null, messageType, messageContent);
+    public void send(String messageType, String messageContent) {
+        send(null, null, messageType, messageContent);
     }
 
     @Override
     public void send(String sessionId, String messageType, String messageContent) {
-        send(sessionId, null, null, messageType, messageContent);
+        send(sessionId, null, messageType, messageContent);
     }
 
     /**
      * 发送消息
      *
-     * @param sessionId Session 编号
-     * @param userType 用户类型
-     * @param userId 用户编号
-     * @param messageType 消息类型
+     * @param sessionId      Session 编号
+     * @param userId         用户编号
+     * @param messageType    消息类型
      * @param messageContent 消息内容
      */
-    public void send(String sessionId, Integer userType, Long userId, String messageType, String messageContent) {
+    public void send(String sessionId, Long userId, String messageType, String messageContent) {
         // 1. 获得 Session 列表
         List<WebSocketSession> sessions = Collections.emptyList();
         if (StrUtil.isNotEmpty(sessionId)) {
@@ -58,15 +57,15 @@ public abstract class AbstractWebSocketMessageSender implements WebSocketMessage
             if (session != null) {
                 sessions = Collections.singletonList(session);
             }
-        } else if (userType != null && userId != null) {
-            sessions = (List<WebSocketSession>) sessionManager.getSessionList(userType, userId);
-        } else if (userType != null) {
-            sessions = (List<WebSocketSession>) sessionManager.getSessionList(userType);
+        } else if (userId != null) {
+            sessions = (List<WebSocketSession>) sessionManager.getSessionList(userId);
+        } else {
+            sessions = (List<WebSocketSession>) sessionManager.getSessionList();
         }
         if (CollUtil.isEmpty(sessions)) {
             if (log.isDebugEnabled()) {
-                log.debug("[send][sessionId({}) userType({}) userId({}) messageType({}) messageContent({}) 未匹配到会话]",
-                        sessionId, userType, userId, messageType, messageContent);
+                log.debug("[send][sessionId({}) userId({}) messageType({}) messageContent({}) 未匹配到会话]",
+                        sessionId, userId, messageType, messageContent);
             }
         }
         // 2. 执行发送
@@ -76,8 +75,8 @@ public abstract class AbstractWebSocketMessageSender implements WebSocketMessage
     /**
      * 发送消息的具体实现
      *
-     * @param sessions Session 列表
-     * @param messageType 消息类型
+     * @param sessions       Session 列表
+     * @param messageType    消息类型
      * @param messageContent 消息内容
      */
     public void doSend(Collection<WebSocketSession> sessions, String messageType, String messageContent) {

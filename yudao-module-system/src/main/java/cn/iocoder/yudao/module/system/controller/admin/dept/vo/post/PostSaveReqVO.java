@@ -3,11 +3,10 @@ package cn.iocoder.yudao.module.system.controller.admin.dept.vo.post;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 @Schema(description = "管理后台 - 岗位创建/修改 Request VO")
 @Data

@@ -31,8 +31,7 @@ public class RabbitMQWebSocketMessageConsumer {
 
     @RabbitHandler
     public void onMessage(RabbitMQWebSocketMessage message) {
-        rabbitMQWebSocketMessageSender.send(message.getSessionId(),
-                message.getUserType(), message.getUserId(),
+        rabbitMQWebSocketMessageSender.send(message.getSessionId(), message.getUserId(),
                 message.getMessageType(), message.getMessageContent());
     }
 

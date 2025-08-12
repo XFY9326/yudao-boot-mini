@@ -15,8 +15,7 @@ public class RedisWebSocketMessageConsumer extends AbstractRedisChannelMessageLi
 
     @Override
     public void onMessage(RedisWebSocketMessage message) {
-        redisWebSocketMessageSender.send(message.getSessionId(),
-                message.getUserType(), message.getUserId(),
+        redisWebSocketMessageSender.send(message.getSessionId(), message.getUserId(),
                 message.getMessageType(), message.getMessageContent());
     }
 

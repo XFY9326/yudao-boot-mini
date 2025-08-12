@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -29,10 +29,6 @@
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
         <easy-trans.version>3.0.6</easy-trans.version>
         <redisson.version>3.41.0</redisson.version>
-        <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
-        <kingbase.jdbc.version>8.6.0</kingbase.jdbc.version>
-        <opengauss.jdbc.version>5.1.0</opengauss.jdbc.version>
-        <taos.version>3.3.3</taos.version>
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.3.2</rocketmq-spring.version>
         <!-- 服务保障相关 -->
@@ -56,7 +52,6 @@
         <hutool-6.version>6.0.0-M19</hutool-6.version>
         <fastexcel.version>1.2.0</fastexcel.version>
         <velocity.version>2.4.1</velocity.version>
-        <fastjson.version>1.2.83</fastjson.version>
         <guava.version>33.4.8-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.11.1</commons-net.version>
@@ -64,29 +59,13 @@
         <tika-core.version>3.1.0</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.1.118.Final</netty.version>
-        <mqtt.version>1.2.5</mqtt.version>
-        <pf4j-spring.version>0.9.0</pf4j-spring.version>
-        <vertx.version>4.5.13</vertx.version>
         <!-- 三方云服务相关 -->
         <awssdk.version>2.30.14</awssdk.version>
-        <justauth.version>1.16.7</justauth.version>
-        <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>2.0.0</jimureport.version>
-        <jimubi.version>1.9.5</jimubi.version>
-        <weixin-java.version>4.7.5.B</weixin-java.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <!-- 统一依赖管理 -->
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-bom</artifactId>
-                <version>${netty.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -109,17 +88,7 @@
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-data-permission</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-biz-ip</artifactId>
                 <version>${revision}</version>
             </dependency>
 
@@ -151,7 +120,8 @@
             </dependency>
 
             <dependency>
-                <groupId>com.github.xingfudeshi</groupId> <!-- TODO 芋艿：https://github.com/xiaoymin/knife4j/issues/874 -->
+                <groupId>com.github.xingfudeshi
+                </groupId> <!-- TODO 芋艿：https://github.com/xiaoymin/knife4j/issues/874 -->
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
             </dependency>
@@ -247,30 +217,6 @@
                         <artifactId>spring-boot-starter-actuator</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.dameng</groupId>
-                <artifactId>DmJdbcDriver18</artifactId>
-                <version>${dm8.jdbc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.opengauss</groupId>
-                <artifactId>opengauss-jdbc</artifactId>
-                <version>${opengauss.jdbc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.com.kingbase</groupId>
-                <artifactId>kingbase8</artifactId>
-                <version>${kingbase.jdbc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.taosdata.jdbc</groupId>
-                <artifactId>taos-jdbcdriver</artifactId>
-                <version>${taos.version}</version>
             </dependency>
 
             <!-- Job 定时任务相关 -->
@@ -488,12 +434,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
@@ -540,95 +480,6 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>s3</artifactId>
                 <version>${awssdk.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>me.zhyd.oauth</groupId>
-                <artifactId>JustAuth</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
-                <version>${justauth.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.xkcoding.justauth</groupId>
-                <artifactId>justauth-spring-boot-starter</artifactId>
-                <version>${justauth-starter.version}</version>
-                <exclusions>
-                    <!-- 移除，避免和项目里的 hutool-all 冲突 -->
-                    <exclusion>
-                        <groupId>cn.hutool</groupId>
-                        <artifactId>hutool-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.binarywang</groupId>
-                <artifactId>weixin-java-pay</artifactId>
-                <version>${weixin-java.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.binarywang</groupId>
-                <artifactId>wx-java-mp-spring-boot-starter</artifactId>
-                <version>${weixin-java.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.binarywang</groupId>
-                <artifactId>wx-java-miniapp-spring-boot-starter</artifactId>
-                <version>${weixin-java.version}</version>
-            </dependency>
-
-            <!-- 积木报表-->
-            <dependency>
-                <groupId>org.jeecgframework.jimureport</groupId>
-                <artifactId>jimureport-spring-boot3-starter-fastjson2</artifactId>
-                <version>${jimureport.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jeecgframework.jimureport</groupId>
-                <artifactId>jimubi-spring-boot3-starter</artifactId>
-                <version>${jimubi.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.github.jsqlparser</groupId>
-                        <artifactId>jsqlparser</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <!-- PF4J -->
-            <dependency>
-                <groupId>org.pf4j</groupId>
-                <artifactId>pf4j-spring</artifactId>
-                <version>${pf4j-spring.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <!-- Vert.x -->
-            <dependency>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-core</artifactId>
-                <version>${vertx.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-web</artifactId>
-                <version>${vertx.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-mqtt</artifactId>
-                <version>${vertx.version}</version>
-            </dependency>
-
-            <!-- MQTT -->
-            <dependency>
-                <groupId>org.eclipse.paho</groupId>
-                <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
-                <version>${mqtt.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

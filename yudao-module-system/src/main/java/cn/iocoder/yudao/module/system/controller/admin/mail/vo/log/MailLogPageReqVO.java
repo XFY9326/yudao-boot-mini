@@ -20,9 +20,6 @@ public class MailLogPageReqVO extends PageParam {
     @Schema(description = "用户编号", example = "30883")
     private Long userId;
 
-    @Schema(description = "用户类型，参见 UserTypeEnum 枚举", example = "2")
-    private Integer userType;
-
     @Schema(description = "接收邮箱地址，模糊匹配", example = "76854@qq.com")
     private String toMail;
 

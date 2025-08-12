@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.system.enums.mail.MailSendStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -29,7 +27,7 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@TenantIgnore
+
 public class MailLogDO extends BaseDO implements Serializable {
 
     /**
@@ -42,25 +40,19 @@ public class MailLogDO extends BaseDO implements Serializable {
      */
     private Long userId;
     /**
-     * 用户类型
-     *
-     * 枚举 {@link UserTypeEnum}
-     */
-    private Integer userType;
-    /**
      * 接收邮箱地址
      */
     private String toMail;
 
     /**
      * 邮箱账号编号
-     *
+     * <p>
      * 关联 {@link MailAccountDO#getId()}
      */
     private Long accountId;
     /**
      * 发送邮箱地址
-     *
+     * <p>
      * 冗余 {@link MailAccountDO#getMail()}
      */
     private String fromMail;
@@ -68,19 +60,19 @@ public class MailLogDO extends BaseDO implements Serializable {
     // ========= 模板相关字段 =========
     /**
      * 模版编号
-     *
+     * <p>
      * 关联 {@link MailTemplateDO#getId()}
      */
     private Long templateId;
     /**
      * 模版编码
-     *
+     * <p>
      * 冗余 {@link MailTemplateDO#getCode()}
      */
     private String templateCode;
     /**
      * 模版发送人名称
-     *
+     * <p>
      * 冗余 {@link MailTemplateDO#getNickname()}
      */
     private String templateNickname;
@@ -90,13 +82,13 @@ public class MailLogDO extends BaseDO implements Serializable {
     private String templateTitle;
     /**
      * 模版内容
-     *
+     * <p>
      * 基于 {@link MailTemplateDO#getContent()} 格式化后的内容
      */
     private String templateContent;
     /**
      * 模版参数
-     *
+     * <p>
      * 基于 {@link MailTemplateDO#getParams()} 输入后的参数
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
@@ -105,7 +97,7 @@ public class MailLogDO extends BaseDO implements Serializable {
     // ========= 发送相关字段 =========
     /**
      * 发送状态
-     *
+     * <p>
      * 枚举 {@link MailSendStatusEnum}
      */
     private Integer sendStatus;

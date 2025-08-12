@@ -91,7 +91,7 @@ public class YudaoWebSecurityConfigurerAdapter {
 
     /**
      * 配置 URL 的安全配置
-     *
+     * <p>
      * anyRequest          |   匹配所有请求路径
      * access              |   SpringEl表达式结果为true时可以访问
      * anonymous           |   匿名可以访问
@@ -128,17 +128,17 @@ public class YudaoWebSecurityConfigurerAdapter {
         httpSecurity
                 // ①：全局共享规则
                 .authorizeHttpRequests(c -> c
-                    // 1.1 静态资源，可匿名访问
-                    .requestMatchers(HttpMethod.GET, "/*.html", "/*.css", "/*.js").permitAll()
-                    // 1.2 设置 @PermitAll 无需认证
-                    .requestMatchers(HttpMethod.GET, permitAllUrls.get(HttpMethod.GET).toArray(new String[0])).permitAll()
-                    .requestMatchers(HttpMethod.POST, permitAllUrls.get(HttpMethod.POST).toArray(new String[0])).permitAll()
-                    .requestMatchers(HttpMethod.PUT, permitAllUrls.get(HttpMethod.PUT).toArray(new String[0])).permitAll()
-                    .requestMatchers(HttpMethod.DELETE, permitAllUrls.get(HttpMethod.DELETE).toArray(new String[0])).permitAll()
-                    .requestMatchers(HttpMethod.HEAD, permitAllUrls.get(HttpMethod.HEAD).toArray(new String[0])).permitAll()
-                    .requestMatchers(HttpMethod.PATCH, permitAllUrls.get(HttpMethod.PATCH).toArray(new String[0])).permitAll()
-                    // 1.3 基于 yudao.security.permit-all-urls 无需认证
-                    .requestMatchers(securityProperties.getPermitAllUrls().toArray(new String[0])).permitAll()
+                        // 1.1 静态资源，可匿名访问
+                        .requestMatchers(HttpMethod.GET, "/*.html", "/*.css", "/*.js").permitAll()
+                        // 1.2 设置 @PermitAll 无需认证
+                        .requestMatchers(HttpMethod.GET, permitAllUrls.get(HttpMethod.GET).toArray(new String[0])).permitAll()
+                        .requestMatchers(HttpMethod.POST, permitAllUrls.get(HttpMethod.POST).toArray(new String[0])).permitAll()
+                        .requestMatchers(HttpMethod.PUT, permitAllUrls.get(HttpMethod.PUT).toArray(new String[0])).permitAll()
+                        .requestMatchers(HttpMethod.DELETE, permitAllUrls.get(HttpMethod.DELETE).toArray(new String[0])).permitAll()
+                        .requestMatchers(HttpMethod.HEAD, permitAllUrls.get(HttpMethod.HEAD).toArray(new String[0])).permitAll()
+                        .requestMatchers(HttpMethod.PATCH, permitAllUrls.get(HttpMethod.PATCH).toArray(new String[0])).permitAll()
+                        // 1.3 基于 yudao.security.permit-all-urls 无需认证
+                        .requestMatchers(securityProperties.getPermitAllUrls().toArray(new String[0])).permitAll()
                 )
                 // ②：每个项目的自定义规则
                 .authorizeHttpRequests(c -> authorizeRequestsCustomizers.forEach(customizer -> customizer.customize(c)))
@@ -150,10 +150,6 @@ public class YudaoWebSecurityConfigurerAdapter {
         // 添加 Token Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
-    }
-
-    private String buildAppApi(String url) {
-        return webProperties.getAppApi().getPrefix() + url;
     }
 
     private Multimap<HttpMethod, String> getPermitAllUrlsFromAnnotations() {

@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 
 /**
@@ -28,13 +28,14 @@ public class SecurityFrameworkUtils {
      */
     public static final String AUTHORIZATION_BEARER = "Bearer";
 
-    private SecurityFrameworkUtils() {}
+    private SecurityFrameworkUtils() {
+    }
 
     /**
      * 从请求中，获得认证 Token
      *
-     * @param request 请求
-     * @param headerName 认证 Token 对应的 Header 名字
+     * @param request       请求
+     * @param headerName    认证 Token 对应的 Header 名字
      * @param parameterName 认证 Token 对应的 Parameter 名字
      * @return 认证 Token
      */
@@ -117,7 +118,7 @@ public class SecurityFrameworkUtils {
      * 设置当前用户
      *
      * @param loginUser 登录用户
-     * @param request 请求
+     * @param request   请求
      */
     public static void setLoginUser(LoginUser loginUser, HttpServletRequest request) {
         // 创建 Authentication，并设置到上下文
@@ -128,7 +129,6 @@ public class SecurityFrameworkUtils {
         // 原因是，Spring Security 的 Filter 在 ApiAccessLogFilter 后面，在它记录访问日志时，线上上下文已经没有用户编号等信息
         if (request != null) {
             WebFrameworkUtils.setLoginUserId(request, loginUser.getId());
-            WebFrameworkUtils.setLoginUserType(request, loginUser.getUserType());
         }
     }
 
@@ -147,14 +147,7 @@ public class SecurityFrameworkUtils {
      */
     public static boolean skipPermissionCheck() {
         LoginUser loginUser = getLoginUser();
-        if (loginUser == null) {
-            return false;
-        }
-        if (loginUser.getVisitTenantId() == null) {
-            return false;
-        }
-        // 重点：跨租户访问时，无法进行权限校验
-        return ObjUtil.notEqual(loginUser.getVisitTenantId(), loginUser.getTenantId());
+        return loginUser != null;
     }
 
 }

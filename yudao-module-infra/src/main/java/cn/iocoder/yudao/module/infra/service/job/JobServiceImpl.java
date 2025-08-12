@@ -42,6 +42,12 @@ public class JobServiceImpl implements JobService {
     @Resource
     private SchedulerManager schedulerManager;
 
+    private static void fillJobMonitorTimeoutEmpty(JobDO job) {
+        if (job.getMonitorTimeout() == null) {
+            job.setMonitorTimeout(0);
+        }
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createJob(JobSaveReqVO createReqVO) throws SchedulerException {
@@ -204,12 +210,6 @@ public class JobServiceImpl implements JobService {
     @Override
     public PageResult<JobDO> getJobPage(JobPageReqVO pageReqVO) {
         return jobMapper.selectPage(pageReqVO);
-    }
-
-    private static void fillJobMonitorTimeoutEmpty(JobDO job) {
-        if (job.getMonitorTimeout() == null) {
-            job.setMonitorTimeout(0);
-        }
     }
 
 }

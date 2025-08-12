@@ -16,6 +16,14 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 @AutoConfiguration(before = RedissonAutoConfigurationV2.class) // 目的：使用自己定义的 RedisTemplate Bean
 public class YudaoRedisAutoConfiguration {
 
+    public static RedisSerializer<?> buildRedisSerializer() {
+        RedisSerializer<Object> json = RedisSerializer.json();
+        // 解决 LocalDateTime 的序列化
+        ObjectMapper objectMapper = (ObjectMapper) ReflectUtil.getFieldValue(json, "mapper");
+        objectMapper.registerModules(new JavaTimeModule());
+        return json;
+    }
+
     /**
      * 创建 RedisTemplate Bean，使用 JSON 序列化方式
      */
@@ -32,14 +40,6 @@ public class YudaoRedisAutoConfiguration {
         template.setValueSerializer(buildRedisSerializer());
         template.setHashValueSerializer(buildRedisSerializer());
         return template;
-    }
-
-    public static RedisSerializer<?> buildRedisSerializer() {
-        RedisSerializer<Object> json = RedisSerializer.json();
-        // 解决 LocalDateTime 的序列化
-        ObjectMapper objectMapper = (ObjectMapper) ReflectUtil.getFieldValue(json, "mapper");
-        objectMapper.registerModules(new JavaTimeModule());
-        return json;
     }
 
 }

@@ -7,10 +7,10 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailLogDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailLogMapper;
 import cn.iocoder.yudao.module.system.enums.mail.MailSendStatusEnum;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
@@ -41,15 +41,15 @@ public class MailLogServiceImpl implements MailLogService {
     }
 
     @Override
-    public Long createMailLog(Long userId, Integer userType, String toMail,
+    public Long createMailLog(Long userId, String toMail,
                               MailAccountDO account, MailTemplateDO template,
                               String templateContent, Map<String, Object> templateParams, Boolean isSend) {
         MailLogDO.MailLogDOBuilder logDOBuilder = MailLogDO.builder();
         // 根据是否要发送，设置状态
         logDOBuilder.sendStatus(Objects.equals(isSend, true) ? MailSendStatusEnum.INIT.getStatus()
-                : MailSendStatusEnum.IGNORE.getStatus())
+                        : MailSendStatusEnum.IGNORE.getStatus())
                 // 用户信息
-                .userId(userId).userType(userType).toMail(toMail)
+                .userId(userId).toMail(toMail)
                 .accountId(account.getId()).fromMail(account.getMail())
                 // 模板相关字段
                 .templateId(template.getId()).templateCode(template.getCode()).templateNickname(template.getNickname())

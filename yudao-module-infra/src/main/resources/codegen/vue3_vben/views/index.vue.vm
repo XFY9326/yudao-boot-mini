@@ -1,24 +1,23 @@
 <script lang="ts" setup>
-import ${simpleClassName}Modal from './${simpleClassName}Modal.vue'
-import { columns, searchFormSchema } from './${classNameVar}.data'
-import { useI18n } from '@/hooks/web/useI18n'
-import { useMessage } from '@/hooks/web/useMessage'
-import { useModal } from '@/components/Modal'
-import { IconEnum } from '@/enums/appEnum'
-import { BasicTable, TableAction, useTable } from '@/components/Table'
-import { delete${simpleClassName}, export${simpleClassName}, get${simpleClassName}Page } from '@/api/${table.moduleName}/${table.businessName}'
+  import {columns, searchFormSchema} from './'
+  import {useI18n} from '@/hooks/web/useI18n'
+  import {useMessage} from '@/hooks/web/useMessage'
+  import {useModal} from '@/components/Modal'
+  import {useTable} from '@/components/Table'
 
-defineOptions({ name: '${table.className}' })
+  import {delete${simpleClassName}, export${simpleClassName}} from '@/api/'
 
-const { t } = useI18n()
-const { createConfirm, createMessage } = useMessage()
-const [registerModal, { openModal }] = useModal()
+  defineOptions({name: '${table.className}'})
 
-const [registerTable, { getForm, reload }] = useTable({
-  title: '${table.classComment}列表',
-  api: get${simpleClassName}Page,
+  const {t} = useI18n()
+  const {createConfirm, createMessage} = useMessage()
+  const [registerModal, {openModal}] = useModal()
+
+  const [registerTable, {getForm, reload}] = useTable({
+    title: '${table.classComment}列表',
+    api: get${simpleClassName}Page,
     columns,
-    formConfig: { labelWidth: 120, schemas: searchFormSchema },
+    formConfig: {labelWidth: 120, schemas: searchFormSchema},
     useSearchForm: true,
     showTableSetting: true,
     actionColumn: {
@@ -27,33 +26,33 @@ const [registerTable, { getForm, reload }] = useTable({
       dataIndex: 'action',
       fixed: 'right',
     },
-})
-
-function handleCreate() {
-  openModal(true, { isUpdate: false })
-}
-
-function handleEdit(record: Recordable) {
-  openModal(true, { record, isUpdate: true })
-}
-
-async function handleExport() {
-  createConfirm({
-    title: t('common.exportTitle'),
-    iconType: 'warning',
-    content: t('common.exportMessage'),
-    async onOk() {
-      await export${simpleClassName}(getForm().getFieldsValue())
-      createMessage.success(t('common.exportSuccessText'))
-    },
   })
-}
 
-async function handleDelete(record: Recordable) {
-  await delete${simpleClassName}(record.id)
-  createMessage.success(t('common.delSuccessText'))
-  reload()
-}
+  function handleCreate() {
+    openModal(true, {isUpdate: false})
+  }
+
+  function handleEdit(record: Recordable) {
+    openModal(true, {record, isUpdate: true})
+  }
+
+  async function handleExport() {
+    createConfirm({
+      title: t('common.exportTitle'),
+      iconType: 'warning',
+      content: t('common.exportMessage'),
+      async onOk() {
+        await export${simpleClassName}(getForm().getFieldsValue())
+        createMessage.success(t('common.exportSuccessText'))
+      },
+    })
+  }
+
+  async function handleDelete(record: Recordable) {
+    await delete${simpleClassName}(record.id)
+    createMessage.success(t('common.delSuccessText'))
+    reload()
+  }
 </script>
 <template>
   <div>
@@ -69,24 +68,24 @@ async function handleDelete(record: Recordable) {
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction
-            :actions="[
-              { icon: IconEnum.EDIT, label: t('action.edit'), auth: '${permissionPrefix}:update', onClick: handleEdit.bind(null, record) },
-              {
-                icon: IconEnum.DELETE,
-                danger: true,
-                label: t('action.delete'),
-                auth: '${permissionPrefix}:delete',
-                popConfirm: {
+              :actions="[
+                  { icon: IconEnum.EDIT, label: t('action.edit'), auth: '${permissionPrefix}:update', onClick: handleEdit.bind(null, record) },
+                  {
+                  icon: IconEnum.DELETE,
+                  danger: true,
+                  label: t('action.delete'),
+                  auth: '${permissionPrefix}:delete',
+                  popConfirm: {
                   title: t('common.delMessage'),
                   placement: 'left',
                   confirm: handleDelete.bind(null, record),
-                },
-              },
-            ]"
+                  },
+                  },
+                  ]"
           />
         </template>
       </template>
     </BasicTable>
-    <${simpleClassName}Modal @register="registerModal" @success="reload()" />
+    <${simpleClassName}Modal @register="registerModal" @success="reload()"/>
   </div>
 </template>

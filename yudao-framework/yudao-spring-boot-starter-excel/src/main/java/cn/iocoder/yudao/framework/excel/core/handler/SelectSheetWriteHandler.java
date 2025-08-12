@@ -6,16 +6,16 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.poi.excel.ExcelUtil;
-import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
-import cn.iocoder.yudao.framework.excel.core.annotations.ExcelColumnSelect;
-import cn.iocoder.yudao.framework.excel.core.function.ExcelColumnSelectFunction;
 import cn.idev.excel.annotation.ExcelIgnore;
 import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
 import cn.idev.excel.write.handler.SheetWriteHandler;
 import cn.idev.excel.write.metadata.holder.WriteSheetHolder;
 import cn.idev.excel.write.metadata.holder.WriteWorkbookHolder;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
+import cn.iocoder.yudao.framework.excel.core.annotations.ExcelColumnSelect;
+import cn.iocoder.yudao.framework.excel.core.function.ExcelColumnSelectFunction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.ss.usermodel.*;
@@ -40,7 +40,7 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
 
     /**
      * 数据起始行从 0 开始
-     *
+     * <p>
      * 约定：本项目第一行有标题所以从 1 开始如果您的 Excel 有多行标题请自行更改
      */
     public static final int FIRST_ROW = 1;
@@ -63,7 +63,7 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         for (Field field : head.getDeclaredFields()) {
             // 关联 https://github.com/YunaiV/ruoyi-vue-pro/pull/853
             // 1.1 忽略 static final 或 transient 的字段
-            if (isStaticFinalOrTransient(field) ) {
+            if (isStaticFinalOrTransient(field)) {
                 continue;
             }
             // 1.2 忽略的字段跳过
@@ -85,6 +85,38 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
     }
 
     /**
+     * 设置单元格下拉选择
+     */
+    private static void setColumnSelect(WriteSheetHolder writeSheetHolder, Workbook workbook, DataValidationHelper helper,
+                                        KeyValue<Integer, List<String>> keyValue) {
+        // 1.1 创建可被其他单元格引用的名称
+        Name name = workbook.createName();
+        String excelColumn = ExcelUtil.indexToColName(keyValue.getKey());
+        // 1.2 下拉框数据来源 eg:字典sheet!$B1:$B2
+        String refers = DICT_SHEET_NAME + "!$" + excelColumn + "$1:$" + excelColumn + "$" + keyValue.getValue().size();
+        name.setNameName("dict" + keyValue.getKey()); // 设置名称的名字
+        name.setRefersToFormula(refers); // 设置公式
+
+        // 2.1 设置约束
+        DataValidationConstraint constraint = helper.createFormulaListConstraint("dict" + keyValue.getKey()); // 设置引用约束
+        // 设置下拉单元格的首行、末行、首列、末列
+        CellRangeAddressList rangeAddressList = new CellRangeAddressList(FIRST_ROW, LAST_ROW,
+                keyValue.getKey(), keyValue.getKey());
+        DataValidation validation = helper.createValidation(constraint, rangeAddressList);
+        if (validation instanceof HSSFDataValidation) {
+            validation.setSuppressDropDownArrow(false);
+        } else {
+            validation.setSuppressDropDownArrow(true);
+            validation.setShowErrorBox(true);
+        }
+        // 2.2 阻止输入非下拉框的值
+        validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+        validation.createErrorBox("提示", "此值不存在于下拉选择中！");
+        // 2.3 添加下拉框约束
+        writeSheetHolder.getSheet().addValidationData(validation);
+    }
+
+    /**
      * 判断字段是否是静态的、最终的、 transient 的
      * 原因：FastExcel 默认是忽略 static final 或 transient 的字段，所以需要判断
      *
@@ -95,7 +127,6 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         return (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers()))
                 || Modifier.isTransient(field.getModifiers());
     }
-
 
     /**
      * 获得下拉数据，并添加到 {@link #selectMap} 中
@@ -150,38 +181,6 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
             // 2.2 设置单元格下拉选择
             setColumnSelect(writeSheetHolder, workbook, helper, keyValue);
         }
-    }
-
-    /**
-     * 设置单元格下拉选择
-     */
-    private static void setColumnSelect(WriteSheetHolder writeSheetHolder, Workbook workbook, DataValidationHelper helper,
-                                        KeyValue<Integer, List<String>> keyValue) {
-        // 1.1 创建可被其他单元格引用的名称
-        Name name = workbook.createName();
-        String excelColumn = ExcelUtil.indexToColName(keyValue.getKey());
-        // 1.2 下拉框数据来源 eg:字典sheet!$B1:$B2
-        String refers = DICT_SHEET_NAME + "!$" + excelColumn + "$1:$" + excelColumn + "$" + keyValue.getValue().size();
-        name.setNameName("dict" + keyValue.getKey()); // 设置名称的名字
-        name.setRefersToFormula(refers); // 设置公式
-
-        // 2.1 设置约束
-        DataValidationConstraint constraint = helper.createFormulaListConstraint("dict" + keyValue.getKey()); // 设置引用约束
-        // 设置下拉单元格的首行、末行、首列、末列
-        CellRangeAddressList rangeAddressList = new CellRangeAddressList(FIRST_ROW, LAST_ROW,
-                keyValue.getKey(), keyValue.getKey());
-        DataValidation validation = helper.createValidation(constraint, rangeAddressList);
-        if (validation instanceof HSSFDataValidation) {
-            validation.setSuppressDropDownArrow(false);
-        } else {
-            validation.setSuppressDropDownArrow(true);
-            validation.setShowErrorBox(true);
-        }
-        // 2.2 阻止输入非下拉框的值
-        validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
-        validation.createErrorBox("提示", "此值不存在于下拉选择中！");
-        // 2.3 添加下拉框约束
-        writeSheetHolder.getSheet().addValidationData(validation);
     }
 
 }

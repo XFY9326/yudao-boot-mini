@@ -27,33 +27,31 @@ public class RocketMQWebSocketMessageSender extends AbstractWebSocketMessageSend
     }
 
     @Override
-    public void send(Integer userType, Long userId, String messageType, String messageContent) {
-        sendRocketMQMessage(null, userId, userType, messageType, messageContent);
+    public void send(Long userId, String messageType, String messageContent) {
+        sendRocketMQMessage(null, userId, messageType, messageContent);
     }
 
     @Override
-    public void send(Integer userType, String messageType, String messageContent) {
-        sendRocketMQMessage(null, null, userType, messageType, messageContent);
+    public void send(String messageType, String messageContent) {
+        sendRocketMQMessage(null, null, messageType, messageContent);
     }
 
     @Override
     public void send(String sessionId, String messageType, String messageContent) {
-        sendRocketMQMessage(sessionId, null, null, messageType, messageContent);
+        sendRocketMQMessage(sessionId, null, messageType, messageContent);
     }
 
     /**
      * 通过 RocketMQ 广播消息
      *
-     * @param sessionId Session 编号
-     * @param userId 用户编号
-     * @param userType 用户类型
-     * @param messageType 消息类型
+     * @param sessionId      Session 编号
+     * @param userId         用户编号
+     * @param messageType    消息类型
      * @param messageContent 消息内容
      */
-    private void sendRocketMQMessage(String sessionId, Long userId, Integer userType,
-                                     String messageType, String messageContent) {
+    private void sendRocketMQMessage(String sessionId, Long userId, String messageType, String messageContent) {
         RocketMQWebSocketMessage mqMessage = new RocketMQWebSocketMessage()
-                .setSessionId(sessionId).setUserId(userId).setUserType(userType)
+                .setSessionId(sessionId).setUserId(userId)
                 .setMessageType(messageType).setMessageContent(messageContent);
         rocketMQTemplate.syncSend(topic, mqMessage);
     }

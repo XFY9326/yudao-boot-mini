@@ -20,9 +20,6 @@ public class NotifyMessagePageReqVO extends PageParam {
     @Schema(description = "用户编号", example = "25025")
     private Long userId;
 
-    @Schema(description = "用户类型", example = "1")
-    private Integer userType;
-
     @Schema(description = "模板编码", example = "test_01")
     private String templateCode;
 

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.dal.dataobject.dict;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @KeySequence("system_dict_data_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TenantIgnore
+
 public class DictDataDO extends BaseDO {
 
     /**
@@ -38,19 +37,19 @@ public class DictDataDO extends BaseDO {
     private String value;
     /**
      * 字典类型
-     *
+     * <p>
      * 冗余 {@link DictDataDO#getDictType()}
      */
     private String dictType;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
     /**
      * 颜色类型
-     *
+     * <p>
      * 对应到 element-ui 为 default、primary、success、info、warning、danger
      */
     private String colorType;

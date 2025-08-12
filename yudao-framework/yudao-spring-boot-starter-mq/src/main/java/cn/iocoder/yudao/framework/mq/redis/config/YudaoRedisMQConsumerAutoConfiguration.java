@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.mq.redis.config;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
-import cn.iocoder.yudao.framework.common.enums.DocumentEnum;
 import cn.iocoder.yudao.framework.mq.redis.core.RedisMQTemplate;
 import cn.iocoder.yudao.framework.mq.redis.core.job.RedisPendingMessageResendJob;
 import cn.iocoder.yudao.framework.mq.redis.core.job.RedisStreamMessageCleanupJob;
@@ -42,10 +41,35 @@ import java.util.Properties;
 public class YudaoRedisMQConsumerAutoConfiguration {
 
     /**
+     * 构建消费者名字，使用本地 IP + 进程编号的方式。
+     * 参考自 RocketMQ clientId 的实现
+     *
+     * @return 消费者名字
+     */
+    private static String buildConsumerName() {
+        return String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
+    }
+
+    /**
+     * 校验 Redis 版本号，是否满足最低的版本号要求！
+     */
+    private static void checkRedisVersion(RedisTemplate<String, ?> redisTemplate) {
+        // 获得 Redis 版本
+        Properties info = redisTemplate.execute((RedisCallback<Properties>) RedisServerCommands::info);
+        String version = MapUtil.getStr(info, "redis_version");
+        // 校验最低版本必须大于等于 5.0.0
+        int majorVersion = Integer.parseInt(StrUtil.subBefore(version, '.', false));
+        if (majorVersion < 5) {
+            throw new IllegalStateException(StrUtil.format("您当前的 Redis 版本为 {}，小于最低要求的 5.0.0 版本！", version));
+        }
+    }
+
+    /**
      * 创建 Redis Pub/Sub 广播消费的容器
      */
     @Bean
-    @ConditionalOnBean(AbstractRedisChannelMessageListener.class) // 只有 AbstractChannelMessageListener 存在的时候，才需要注册 Redis pubsub 监听
+    @ConditionalOnBean(AbstractRedisChannelMessageListener.class)
+    // 只有 AbstractChannelMessageListener 存在的时候，才需要注册 Redis pubsub 监听
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisMQTemplate redisMQTemplate, List<AbstractRedisChannelMessageListener<?>> listeners) {
         // 创建 RedisMessageListenerContainer 对象
@@ -66,7 +90,8 @@ public class YudaoRedisMQConsumerAutoConfiguration {
      * 创建 Redis Stream 重新消费的任务
      */
     @Bean
-    @ConditionalOnBean(AbstractRedisStreamMessageListener.class) // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis pubsub 监听
+    @ConditionalOnBean(AbstractRedisStreamMessageListener.class)
+    // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis pubsub 监听
     public RedisPendingMessageResendJob redisPendingMessageResendJob(List<AbstractRedisStreamMessageListener<?>> listeners,
                                                                      RedisMQTemplate redisTemplate,
                                                                      @Value("${spring.application.name}") String groupName,
@@ -87,11 +112,12 @@ public class YudaoRedisMQConsumerAutoConfiguration {
 
     /**
      * 创建 Redis Stream 集群消费的容器
-     *
+     * <p>
      * 基础知识：<a href="https://www.geek-book.com/src/docs/redis/redis/redis.io/commands/xreadgroup.html">Redis Stream 的 xreadgroup 命令</a>
      */
     @Bean(initMethod = "start", destroyMethod = "stop")
-    @ConditionalOnBean(AbstractRedisStreamMessageListener.class) // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis pubsub 监听
+    @ConditionalOnBean(AbstractRedisStreamMessageListener.class)
+    // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis pubsub 监听
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer(
             RedisMQTemplate redisMQTemplate, List<AbstractRedisStreamMessageListener<?>> listeners) {
         RedisTemplate<String, ?> redisTemplate = redisMQTemplate.getRedisTemplate();
@@ -133,31 +159,6 @@ public class YudaoRedisMQConsumerAutoConfiguration {
                     listener.getStreamKey(), listener.getClass().getName());
         });
         return container;
-    }
-
-    /**
-     * 构建消费者名字，使用本地 IP + 进程编号的方式。
-     * 参考自 RocketMQ clientId 的实现
-     *
-     * @return 消费者名字
-     */
-    private static String buildConsumerName() {
-        return String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
-    }
-
-    /**
-     * 校验 Redis 版本号，是否满足最低的版本号要求！
-     */
-    private static void checkRedisVersion(RedisTemplate<String, ?> redisTemplate) {
-        // 获得 Redis 版本
-        Properties info = redisTemplate.execute((RedisCallback<Properties>) RedisServerCommands::info);
-        String version = MapUtil.getStr(info, "redis_version");
-        // 校验最低版本必须大于等于 5.0.0
-        int majorVersion = Integer.parseInt(StrUtil.subBefore(version, '.', false));
-        if (majorVersion < 5) {
-            throw new IllegalStateException(StrUtil.format("您当前的 Redis 版本为 {}，小于最低要求的 5.0.0 版本！" +
-                    "请参考 {} 文档进行安装。", version, DocumentEnum.REDIS_INSTALL.getUrl()));
-        }
     }
 
 }

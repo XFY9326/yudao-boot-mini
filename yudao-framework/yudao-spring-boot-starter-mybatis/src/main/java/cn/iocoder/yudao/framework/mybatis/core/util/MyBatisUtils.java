@@ -120,7 +120,7 @@ public class MyBatisUtils {
 
     /**
      * 将驼峰命名转换为下划线命名
-     *
+     * <p>
      * 使用场景：
      * 1. <a href="https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1357/files">fix:修复"商品统计聚合函数的别名与排序字段不符"导致的 SQL 异常</a>
      *

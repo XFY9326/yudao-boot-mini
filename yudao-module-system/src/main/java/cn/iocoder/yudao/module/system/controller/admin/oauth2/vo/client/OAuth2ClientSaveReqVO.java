@@ -3,12 +3,12 @@ package cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import org.hibernate.validator.constraints.URL;
-
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import org.hibernate.validator.constraints.URL;
+
 import java.util.List;
 
 @Schema(description = "管理后台 - OAuth2 客户端创建/修改 Request VO")

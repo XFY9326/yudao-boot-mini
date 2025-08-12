@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.job;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.infra.enums.job.JobStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -21,7 +20,6 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TenantIgnore
 public class JobDO extends BaseDO {
 
     /**
@@ -35,7 +33,7 @@ public class JobDO extends BaseDO {
     private String name;
     /**
      * 任务状态
-     *
+     * <p>
      * 枚举 {@link JobStatusEnum}
      */
     private Integer status;
@@ -68,7 +66,7 @@ public class JobDO extends BaseDO {
     /**
      * 监控超时时间，单位：毫秒
      * 为空时，表示不监控
-     *
+     * <p>
      * 注意，这里的超时的目的，不是进行任务的取消，而是告警任务的执行时间过长
      */
     private Integer monitorTimeout;

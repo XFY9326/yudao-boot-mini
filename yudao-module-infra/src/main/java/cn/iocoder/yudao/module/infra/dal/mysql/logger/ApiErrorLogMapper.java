@@ -22,7 +22,6 @@ public interface ApiErrorLogMapper extends BaseMapperX<ApiErrorLogDO> {
     default PageResult<ApiErrorLogDO> selectPage(ApiErrorLogPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ApiErrorLogDO>()
                 .eqIfPresent(ApiErrorLogDO::getUserId, reqVO.getUserId())
-                .eqIfPresent(ApiErrorLogDO::getUserType, reqVO.getUserType())
                 .eqIfPresent(ApiErrorLogDO::getApplicationName, reqVO.getApplicationName())
                 .likeIfPresent(ApiErrorLogDO::getRequestUrl, reqVO.getRequestUrl())
                 .betweenIfPresent(ApiErrorLogDO::getExceptionTime, reqVO.getExceptionTime())

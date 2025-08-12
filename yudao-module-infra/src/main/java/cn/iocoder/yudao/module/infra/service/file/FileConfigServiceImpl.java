@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,10 @@ import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_CONFIG
 public class FileConfigServiceImpl implements FileConfigService {
 
     private static final Long CACHE_MASTER_ID = 0L;
-
+    @Resource
+    private FileClientFactory fileClientFactory;
+    @Resource
+    private FileConfigMapper fileConfigMapper;
     /**
      * {@link FileClient} 缓存，通过它异步刷新 fileClientFactory
      */
@@ -64,13 +68,6 @@ public class FileConfigServiceImpl implements FileConfigService {
                 }
 
             });
-
-    @Resource
-    private FileClientFactory fileClientFactory;
-
-    @Resource
-    private FileConfigMapper fileConfigMapper;
-
     @Resource
     private Validator validator;
 
@@ -190,8 +187,8 @@ public class FileConfigServiceImpl implements FileConfigService {
         // 校验存在
         validateFileConfigExists(id);
         // 上传文件
-        byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
-        return getFileClient(id).upload(content, IdUtil.fastSimpleUUID() + ".jpg", "image/jpeg");
+        byte[] content = "Hello world".getBytes(StandardCharsets.UTF_8);
+        return getFileClient(id).upload(content, IdUtil.fastSimpleUUID() + ".txt", "text/plain");
     }
 
     @Override

@@ -13,8 +13,6 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 public class ApiSignatureRedisDAO {
 
-    private final StringRedisTemplate stringRedisTemplate;
-
     /**
      * 验签随机数
      * <p>
@@ -23,7 +21,6 @@ public class ApiSignatureRedisDAO {
      * 过期时间：不固定
      */
     private static final String SIGNATURE_NONCE = "api_signature_nonce:%s:%s";
-
     /**
      * 签名密钥
      * <p>
@@ -33,8 +30,13 @@ public class ApiSignatureRedisDAO {
      * 过期时间：永不过期（预加载到 Redis）
      */
     private static final String SIGNATURE_APPID = "api_signature_app";
+    private final StringRedisTemplate stringRedisTemplate;
 
     // ========== 验签随机数 ==========
+
+    private static String formatNonceKey(String appId, String nonce) {
+        return String.format(SIGNATURE_NONCE, appId, nonce);
+    }
 
     public String getNonce(String appId, String nonce) {
         return stringRedisTemplate.opsForValue().get(formatNonceKey(appId, nonce));
@@ -42,10 +44,6 @@ public class ApiSignatureRedisDAO {
 
     public Boolean setNonce(String appId, String nonce, int time, TimeUnit timeUnit) {
         return stringRedisTemplate.opsForValue().setIfAbsent(formatNonceKey(appId, nonce), "", time, timeUnit);
-    }
-
-    private static String formatNonceKey(String appId, String nonce) {
-        return String.format(SIGNATURE_NONCE, appId, nonce);
     }
 
     // ========== 签名密钥 ==========

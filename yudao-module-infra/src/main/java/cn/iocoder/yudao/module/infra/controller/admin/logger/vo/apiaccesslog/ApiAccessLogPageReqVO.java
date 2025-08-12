@@ -16,9 +16,6 @@ public class ApiAccessLogPageReqVO extends PageParam {
     @Schema(description = "用户编号", example = "666")
     private Long userId;
 
-    @Schema(description = "用户类型", example = "2")
-    private Integer userType;
-
     @Schema(description = "应用名", example = "dashboard")
     private String applicationName;
 

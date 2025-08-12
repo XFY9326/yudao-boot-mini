@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.framework.ratelimiter.core.redis;
 
 import lombok.AllArgsConstructor;
-import org.redisson.api.*;
+import org.redisson.api.RRateLimiter;
+import org.redisson.api.RateLimiterConfig;
+import org.redisson.api.RateType;
+import org.redisson.api.RedissonClient;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -17,7 +20,7 @@ public class RateLimiterRedisDAO {
 
     /**
      * 限流操作
-     *
+     * <p>
      * KEY 格式：rate_limiter:%s // 参数为 uuid
      * VALUE 格式：String
      * 过期时间：不固定
@@ -26,15 +29,15 @@ public class RateLimiterRedisDAO {
 
     private final RedissonClient redissonClient;
 
+    private static String formatKey(String key) {
+        return String.format(RATE_LIMITER, key);
+    }
+
     public Boolean tryAcquire(String key, int count, int time, TimeUnit timeUnit) {
         // 1. 获得 RRateLimiter，并设置 rate 速率
         RRateLimiter rateLimiter = getRRateLimiter(key, count, time, timeUnit);
         // 2. 尝试获取 1 个
         return rateLimiter.tryAcquire();
-    }
-
-    private static String formatKey(String key) {
-        return String.format(RATE_LIMITER, key);
     }
 
     private RRateLimiter getRRateLimiter(String key, long count, int time, TimeUnit timeUnit) {

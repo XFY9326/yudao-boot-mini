@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.file;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.db.DBFileClient;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -10,7 +9,7 @@ import lombok.*;
 
 /**
  * 文件内容表
- *
+ * <p>
  * 专门用于存储 {@link DBFileClient} 的文件内容
  *
  * @author 芋道源码
@@ -23,7 +22,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TenantIgnore
+
 public class FileContentDO extends BaseDO {
 
     /**
@@ -33,7 +32,7 @@ public class FileContentDO extends BaseDO {
     private Long id;
     /**
      * 配置编号
-     *
+     * <p>
      * 关联 {@link FileConfigDO#getId()}
      */
     private Long configId;

@@ -4,10 +4,10 @@ import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2CodeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2CodeMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,11 +32,15 @@ public class OAuth2CodeServiceImpl implements OAuth2CodeService {
     @Resource
     private OAuth2CodeMapper oauth2CodeMapper;
 
+    private static String generateCode() {
+        return IdUtil.fastSimpleUUID();
+    }
+
     @Override
-    public OAuth2CodeDO createAuthorizationCode(Long userId, Integer userType, String clientId,
+    public OAuth2CodeDO createAuthorizationCode(Long userId, String clientId,
                                                 List<String> scopes, String redirectUri, String state) {
         OAuth2CodeDO codeDO = new OAuth2CodeDO().setCode(generateCode())
-                .setUserId(userId).setUserType(userType)
+                .setUserId(userId)
                 .setClientId(clientId).setScopes(scopes)
                 .setExpiresTime(LocalDateTime.now().plusSeconds(TIMEOUT))
                 .setRedirectUri(redirectUri).setState(state);
@@ -55,10 +59,6 @@ public class OAuth2CodeServiceImpl implements OAuth2CodeService {
         }
         oauth2CodeMapper.deleteById(codeDO.getId());
         return codeDO;
-    }
-
-    private static String generateCode() {
-        return IdUtil.fastSimpleUUID();
     }
 
 }

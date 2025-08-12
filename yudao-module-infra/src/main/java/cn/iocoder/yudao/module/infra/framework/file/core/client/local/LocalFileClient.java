@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.AbstractFileClient;
 
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  * 本地文件客户端
@@ -42,7 +43,7 @@ public class LocalFileClient extends AbstractFileClient<LocalFileClientConfig> {
     }
 
     private String getFilePath(String path) {
-        return config.getBasePath() + File.separator + path;
+        return Path.of(config.getBasePath(), path).toString();
     }
 
 }

@@ -5,14 +5,11 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
-import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
@@ -28,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -57,12 +53,20 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
     @Lazy // 懒加载，避免循环依赖
     private AdminUserService adminUserService;
 
+    private static String generateAccessToken() {
+        return IdUtil.fastSimpleUUID();
+    }
+
+    private static String generateRefreshToken() {
+        return IdUtil.fastSimpleUUID();
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public OAuth2AccessTokenDO createAccessToken(Long userId, Integer userType, String clientId, List<String> scopes) {
+    public OAuth2AccessTokenDO createAccessToken(Long userId, String clientId, List<String> scopes) {
         OAuth2ClientDO clientDO = oauth2ClientService.validOAuthClientFromCache(clientId);
         // 创建刷新令牌
-        OAuth2RefreshTokenDO refreshTokenDO = createOAuth2RefreshToken(userId, userType, clientDO, scopes);
+        OAuth2RefreshTokenDO refreshTokenDO = createOAuth2RefreshToken(userId, clientDO, scopes);
         // 创建访问令牌
         return createOAuth2AccessToken(refreshTokenDO, clientDO);
     }
@@ -160,21 +164,20 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
 
     private OAuth2AccessTokenDO createOAuth2AccessToken(OAuth2RefreshTokenDO refreshTokenDO, OAuth2ClientDO clientDO) {
         OAuth2AccessTokenDO accessTokenDO = new OAuth2AccessTokenDO().setAccessToken(generateAccessToken())
-                .setUserId(refreshTokenDO.getUserId()).setUserType(refreshTokenDO.getUserType())
-                .setUserInfo(buildUserInfo(refreshTokenDO.getUserId(), refreshTokenDO.getUserType()))
+                .setUserId(refreshTokenDO.getUserId())
+                .setUserInfo(buildUserInfo(refreshTokenDO.getUserId()))
                 .setClientId(clientDO.getClientId()).setScopes(refreshTokenDO.getScopes())
                 .setRefreshToken(refreshTokenDO.getRefreshToken())
                 .setExpiresTime(LocalDateTime.now().plusSeconds(clientDO.getAccessTokenValiditySeconds()));
-        accessTokenDO.setTenantId(TenantContextHolder.getTenantId()); // 手动设置租户编号，避免缓存到 Redis 的时候，无对应的租户编号
         oauth2AccessTokenMapper.insert(accessTokenDO);
         // 记录到 Redis 中
         oauth2AccessTokenRedisDAO.set(accessTokenDO);
         return accessTokenDO;
     }
 
-    private OAuth2RefreshTokenDO createOAuth2RefreshToken(Long userId, Integer userType, OAuth2ClientDO clientDO, List<String> scopes) {
+    private OAuth2RefreshTokenDO createOAuth2RefreshToken(Long userId, OAuth2ClientDO clientDO, List<String> scopes) {
         OAuth2RefreshTokenDO refreshToken = new OAuth2RefreshTokenDO().setRefreshToken(generateRefreshToken())
-                .setUserId(userId).setUserType(userType)
+                .setUserId(userId)
                 .setClientId(clientDO.getClientId()).setScopes(scopes)
                 .setExpiresTime(LocalDateTime.now().plusSeconds(clientDO.getRefreshTokenValiditySeconds()));
         oauth2RefreshTokenMapper.insert(refreshToken);
@@ -184,36 +187,20 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
     private OAuth2AccessTokenDO convertToAccessToken(OAuth2RefreshTokenDO refreshTokenDO) {
         OAuth2AccessTokenDO accessTokenDO = BeanUtils.toBean(refreshTokenDO, OAuth2AccessTokenDO.class)
                 .setAccessToken(refreshTokenDO.getRefreshToken());
-        TenantUtils.execute(refreshTokenDO.getTenantId(),
-                        () -> accessTokenDO.setUserInfo(buildUserInfo(refreshTokenDO.getUserId(), refreshTokenDO.getUserType())));
+        accessTokenDO.setUserInfo(buildUserInfo(refreshTokenDO.getUserId()));
         return accessTokenDO;
     }
 
     /**
      * 加载用户信息，方便 {@link cn.iocoder.yudao.framework.security.core.LoginUser} 获取到昵称、部门等信息
      *
-     * @param userId 用户编号
-     * @param userType 用户类型
+     * @param userId   用户编号
      * @return 用户信息
      */
-    private Map<String, String> buildUserInfo(Long userId, Integer userType) {
-        if (userType.equals(UserTypeEnum.ADMIN.getValue())) {
-            AdminUserDO user = adminUserService.getUser(userId);
-            return MapUtil.builder(LoginUser.INFO_KEY_NICKNAME, user.getNickname())
-                    .put(LoginUser.INFO_KEY_DEPT_ID, StrUtil.toStringOrNull(user.getDeptId())).build();
-        } else if (userType.equals(UserTypeEnum.MEMBER.getValue())) {
-            // 注意：目前 Member 暂时不读取，可以按需实现
-            return Collections.emptyMap();
-        }
-        return null;
-    }
-
-    private static String generateAccessToken() {
-        return IdUtil.fastSimpleUUID();
-    }
-
-    private static String generateRefreshToken() {
-        return IdUtil.fastSimpleUUID();
+    private Map<String, String> buildUserInfo(Long userId) {
+        AdminUserDO user = adminUserService.getUser(userId);
+        return MapUtil.builder(LoginUser.INFO_KEY_NICKNAME, user.getNickname())
+                .put(LoginUser.INFO_KEY_DEPT_ID, StrUtil.toStringOrNull(user.getDeptId())).build();
     }
 
 }

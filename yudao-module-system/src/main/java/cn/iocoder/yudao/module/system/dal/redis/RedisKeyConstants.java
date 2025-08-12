@@ -90,21 +90,4 @@ public interface RedisKeyConstants {
      * VALUE 数据格式：String 模版信息
      */
     String MAIL_TEMPLATE = "mail_template";
-
-    /**
-     * 短信模版的缓存
-     * <p>
-     * KEY 格式：sms_template:{id}
-     * VALUE 数据格式：String 模版信息
-     */
-    String SMS_TEMPLATE = "sms_template";
-
-    /**
-     * 小程序订阅模版的缓存
-     *
-     * KEY 格式：wxa_subscribe_template:{userType}
-     * VALUE 数据格式 String, 模版信息
-     */
-    String WXA_SUBSCRIBE_TEMPLATE = "wxa_subscribe_template";
-
 }

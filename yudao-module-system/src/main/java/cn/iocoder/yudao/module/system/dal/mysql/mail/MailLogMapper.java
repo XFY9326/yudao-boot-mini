@@ -13,7 +13,6 @@ public interface MailLogMapper extends BaseMapperX<MailLogDO> {
     default PageResult<MailLogDO> selectPage(MailLogPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<MailLogDO>()
                 .eqIfPresent(MailLogDO::getUserId, reqVO.getUserId())
-                .eqIfPresent(MailLogDO::getUserType, reqVO.getUserType())
                 .likeIfPresent(MailLogDO::getToMail, reqVO.getToMail())
                 .eqIfPresent(MailLogDO::getAccountId, reqVO.getAccountId())
                 .eqIfPresent(MailLogDO::getTemplateId, reqVO.getTemplateId())

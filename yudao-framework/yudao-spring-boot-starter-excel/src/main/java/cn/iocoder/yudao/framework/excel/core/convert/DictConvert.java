@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.framework.excel.core.convert;
 
 import cn.hutool.core.convert.Convert;
-import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
-import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.idev.excel.converters.Converter;
 import cn.idev.excel.enums.CellDataTypeEnum;
 import cn.idev.excel.metadata.GlobalConfiguration;
 import cn.idev.excel.metadata.data.ReadCellData;
 import cn.idev.excel.metadata.data.WriteCellData;
 import cn.idev.excel.metadata.property.ExcelContentProperty;
+import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,6 +18,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class DictConvert implements Converter<Object> {
+
+    private static String getType(ExcelContentProperty contentProperty) {
+        return contentProperty.getField().getAnnotation(DictFormat.class).value();
+    }
 
     @Override
     public Class<?> supportJavaTypeKey() {
@@ -63,10 +67,6 @@ public class DictConvert implements Converter<Object> {
         }
         // 生成 Excel 小表格
         return new WriteCellData<>(label);
-    }
-
-    private static String getType(ExcelContentProperty contentProperty) {
-        return contentProperty.getField().getAnnotation(DictFormat.class).value();
     }
 
 }

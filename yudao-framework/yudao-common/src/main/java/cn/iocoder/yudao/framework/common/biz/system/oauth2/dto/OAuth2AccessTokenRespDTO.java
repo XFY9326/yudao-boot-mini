@@ -28,10 +28,6 @@ public class OAuth2AccessTokenRespDTO implements Serializable {
      */
     private Long userId;
     /**
-     * 用户类型
-     */
-    private Integer userType;
-    /**
      * 过期时间
      */
     private LocalDateTime expiresTime;

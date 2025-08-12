@@ -6,10 +6,10 @@ import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyM
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyMessageDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.notify.NotifyMessageMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +27,8 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
     private NotifyMessageMapper notifyMessageMapper;
 
     @Override
-    public Long createNotifyMessage(Long userId, Integer userType,
-                                    NotifyTemplateDO template, String templateContent, Map<String, Object> templateParams) {
-        NotifyMessageDO message = new NotifyMessageDO().setUserId(userId).setUserType(userType)
+    public Long createNotifyMessage(Long userId, NotifyTemplateDO template, String templateContent, Map<String, Object> templateParams) {
+        NotifyMessageDO message = new NotifyMessageDO().setUserId(userId)
                 .setTemplateId(template.getId()).setTemplateCode(template.getCode())
                 .setTemplateType(template.getType()).setTemplateNickname(template.getNickname())
                 .setTemplateContent(templateContent).setTemplateParams(templateParams).setReadStatus(false);
@@ -43,8 +42,8 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
     }
 
     @Override
-    public PageResult<NotifyMessageDO> getMyMyNotifyMessagePage(NotifyMessageMyPageReqVO pageReqVO, Long userId, Integer userType) {
-        return notifyMessageMapper.selectPage(pageReqVO, userId, userType);
+    public PageResult<NotifyMessageDO> getMyMyNotifyMessagePage(NotifyMessageMyPageReqVO pageReqVO, Long userId) {
+        return notifyMessageMapper.selectPage(pageReqVO, userId);
     }
 
     @Override
@@ -53,23 +52,23 @@ public class NotifyMessageServiceImpl implements NotifyMessageService {
     }
 
     @Override
-    public List<NotifyMessageDO> getUnreadNotifyMessageList(Long userId, Integer userType, Integer size) {
-        return notifyMessageMapper.selectUnreadListByUserIdAndUserType(userId, userType, size);
+    public List<NotifyMessageDO> getUnreadNotifyMessageList(Long userId, Integer size) {
+        return notifyMessageMapper.selectUnreadListByUserId(userId, size);
     }
 
     @Override
-    public Long getUnreadNotifyMessageCount(Long userId, Integer userType) {
-        return notifyMessageMapper.selectUnreadCountByUserIdAndUserType(userId, userType);
+    public Long getUnreadNotifyMessageCount(Long userId) {
+        return notifyMessageMapper.selectUnreadCountByUserId(userId);
     }
 
     @Override
-    public int updateNotifyMessageRead(Collection<Long> ids, Long userId, Integer userType) {
-        return notifyMessageMapper.updateListRead(ids, userId, userType);
+    public int updateNotifyMessageRead(Collection<Long> ids, Long userId) {
+        return notifyMessageMapper.updateListRead(ids, userId);
     }
 
     @Override
-    public int updateAllNotifyMessageRead(Long userId, Integer userType) {
-        return notifyMessageMapper.updateListRead(userId, userType);
+    public int updateAllNotifyMessageRead(Long userId) {
+        return notifyMessageMapper.updateListRead(userId);
     }
 
 }

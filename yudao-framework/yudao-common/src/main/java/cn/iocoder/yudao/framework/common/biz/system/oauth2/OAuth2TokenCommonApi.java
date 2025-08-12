@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.common.biz.system.oauth2;
 import cn.iocoder.yudao.framework.common.biz.system.oauth2.dto.OAuth2AccessTokenCheckRespDTO;
 import cn.iocoder.yudao.framework.common.biz.system.oauth2.dto.OAuth2AccessTokenCreateReqDTO;
 import cn.iocoder.yudao.framework.common.biz.system.oauth2.dto.OAuth2AccessTokenRespDTO;
-
 import jakarta.validation.Valid;
 
 /**
@@ -41,7 +40,7 @@ public interface OAuth2TokenCommonApi {
      * 刷新访问令牌
      *
      * @param refreshToken 刷新令牌
-     * @param clientId 客户端编号
+     * @param clientId     客户端编号
      * @return 访问令牌的信息
      */
     OAuth2AccessTokenRespDTO refreshAccessToken(String refreshToken, String clientId);

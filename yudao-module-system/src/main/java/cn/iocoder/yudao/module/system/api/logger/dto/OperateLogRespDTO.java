@@ -34,10 +34,6 @@ public class OperateLogRespDTO implements VO {
      */
     private String userName;
     /**
-     * 用户类型
-     */
-    private Integer userType;
-    /**
      * 操作模块类型
      */
     private String type;

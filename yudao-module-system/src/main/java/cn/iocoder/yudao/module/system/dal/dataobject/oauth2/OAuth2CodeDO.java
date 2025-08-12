@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.oauth2;
 
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -36,14 +35,8 @@ public class OAuth2CodeDO extends BaseDO {
      */
     private Long userId;
     /**
-     * 用户类型
-     *
-     * 枚举 {@link UserTypeEnum}
-     */
-    private Integer userType;
-    /**
      * 客户端编号
-     *
+     * <p>
      * 关联 {@link OAuth2ClientDO#getClientId()}
      */
     private String clientId;

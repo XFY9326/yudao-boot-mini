@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.websocket.core.session;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.websocket.core.util.WebSocketFrameworkUtils;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -23,18 +22,17 @@ public class WebSocketSessionManagerImpl implements WebSocketSessionManager {
 
     /**
      * id 与 WebSocketSession 映射
-     *
+     * <p>
      * key：Session 编号
      */
     private final ConcurrentMap<String, WebSocketSession> idSessions = new ConcurrentHashMap<>();
 
     /**
      * user 与 WebSocketSession 映射
-     *
-     * key1：用户类型
-     * key2：用户编号
+     * <p>
+     * key：用户编号
      */
-    private final ConcurrentMap<Integer, ConcurrentMap<Long, CopyOnWriteArrayList<WebSocketSession>>> userSessions
+    private final ConcurrentMap<Long, CopyOnWriteArrayList<WebSocketSession>> userSessions
             = new ConcurrentHashMap<>();
 
     @Override
@@ -46,18 +44,11 @@ public class WebSocketSessionManagerImpl implements WebSocketSessionManager {
         if (user == null) {
             return;
         }
-        ConcurrentMap<Long, CopyOnWriteArrayList<WebSocketSession>> userSessionsMap = userSessions.get(user.getUserType());
-        if (userSessionsMap == null) {
-            userSessionsMap = new ConcurrentHashMap<>();
-            if (userSessions.putIfAbsent(user.getUserType(), userSessionsMap) != null) {
-                userSessionsMap = userSessions.get(user.getUserType());
-            }
-        }
-        CopyOnWriteArrayList<WebSocketSession> sessions = userSessionsMap.get(user.getId());
+        CopyOnWriteArrayList<WebSocketSession> sessions = userSessions.get(user.getId());
         if (sessions == null) {
             sessions = new CopyOnWriteArrayList<>();
-            if (userSessionsMap.putIfAbsent(user.getId(), sessions) != null) {
-                sessions = userSessionsMap.get(user.getId());
+            if (userSessions.putIfAbsent(user.getId(), sessions) != null) {
+                sessions = userSessions.get(user.getId());
             }
         }
         sessions.add(session);
@@ -72,14 +63,10 @@ public class WebSocketSessionManagerImpl implements WebSocketSessionManager {
         if (user == null) {
             return;
         }
-        ConcurrentMap<Long, CopyOnWriteArrayList<WebSocketSession>> userSessionsMap = userSessions.get(user.getUserType());
-        if (userSessionsMap == null) {
-            return;
-        }
-        CopyOnWriteArrayList<WebSocketSession> sessions = userSessionsMap.get(user.getId());
+        CopyOnWriteArrayList<WebSocketSession> sessions = userSessions.get(user.getId());
         sessions.removeIf(session0 -> session0.getId().equals(session.getId()));
         if (CollUtil.isEmpty(sessions)) {
-            userSessionsMap.remove(user.getId(), sessions);
+            userSessions.remove(user.getId(), sessions);
         }
     }
 
@@ -89,23 +76,14 @@ public class WebSocketSessionManagerImpl implements WebSocketSessionManager {
     }
 
     @Override
-    public Collection<WebSocketSession> getSessionList(Integer userType) {
-        ConcurrentMap<Long, CopyOnWriteArrayList<WebSocketSession>> userSessionsMap = userSessions.get(userType);
-        if (CollUtil.isEmpty(userSessionsMap)) {
+    public Collection<WebSocketSession> getSessionList() {
+        if (CollUtil.isEmpty(userSessions)) {
             return new ArrayList<>();
         }
         LinkedList<WebSocketSession> result = new LinkedList<>(); // 避免扩容
-        Long contextTenantId = TenantContextHolder.getTenantId();
-        for (List<WebSocketSession> sessions : userSessionsMap.values()) {
+        for (List<WebSocketSession> sessions : userSessions.values()) {
             if (CollUtil.isEmpty(sessions)) {
                 continue;
-            }
-            // 特殊：如果租户不匹配，则直接排除
-            if (contextTenantId != null) {
-                Long userTenantId = WebSocketFrameworkUtils.getTenantId(sessions.get(0));
-                if (!contextTenantId.equals(userTenantId)) {
-                    continue;
-                }
             }
             result.addAll(sessions);
         }
@@ -113,12 +91,11 @@ public class WebSocketSessionManagerImpl implements WebSocketSessionManager {
     }
 
     @Override
-    public Collection<WebSocketSession> getSessionList(Integer userType, Long userId) {
-        ConcurrentMap<Long, CopyOnWriteArrayList<WebSocketSession>> userSessionsMap = userSessions.get(userType);
-        if (CollUtil.isEmpty(userSessionsMap)) {
+    public Collection<WebSocketSession> getSessionList(Long userId) {
+        if (CollUtil.isEmpty(userSessions)) {
             return new ArrayList<>();
         }
-        CopyOnWriteArrayList<WebSocketSession> sessions = userSessionsMap.get(userId);
+        CopyOnWriteArrayList<WebSocketSession> sessions = userSessions.get(userId);
         return CollUtil.isNotEmpty(sessions) ? new ArrayList<>(sessions) : new ArrayList<>();
     }
 

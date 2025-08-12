@@ -22,8 +22,7 @@ public class RocketMQWebSocketMessageConsumer implements RocketMQListener<Rocket
 
     @Override
     public void onMessage(RocketMQWebSocketMessage message) {
-        rocketMQWebSocketMessageSender.send(message.getSessionId(),
-                message.getUserType(), message.getUserId(),
+        rocketMQWebSocketMessageSender.send(message.getSessionId(), message.getUserId(),
                 message.getMessageType(), message.getMessageContent());
     }
 

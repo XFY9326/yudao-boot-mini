@@ -2,18 +2,16 @@ package cn.iocoder.yudao.module.system.service.mail;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.mq.message.mail.MailSendMessage;
 import cn.iocoder.yudao.module.system.mq.producer.mail.MailProducer;
-import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.hutool.extra.mail.*;
+import org.dromara.hutool.extra.mail.MailAccount;
+import org.dromara.hutool.extra.mail.MailUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -35,8 +33,6 @@ public class MailSendServiceImpl implements MailSendService {
 
     @Resource
     private AdminUserService adminUserService;
-    @Resource
-    private MemberService memberService;
 
     @Resource
     private MailAccountService mailAccountService;
@@ -49,32 +45,7 @@ public class MailSendServiceImpl implements MailSendService {
     private MailProducer mailProducer;
 
     @Override
-    public Long sendSingleMailToAdmin(String mail, Long userId,
-                                      String templateCode, Map<String, Object> templateParams) {
-        // 如果 mail 为空，则加载用户编号对应的邮箱
-        if (StrUtil.isEmpty(mail)) {
-            AdminUserDO user = adminUserService.getUser(userId);
-            if (user != null) {
-                mail = user.getEmail();
-            }
-        }
-        // 执行发送
-        return sendSingleMail(mail, userId, UserTypeEnum.ADMIN.getValue(), templateCode, templateParams);
-    }
-
-    @Override
-    public Long sendSingleMailToMember(String mail, Long userId,
-                                       String templateCode, Map<String, Object> templateParams) {
-        // 如果 mail 为空，则加载用户编号对应的邮箱
-        if (StrUtil.isEmpty(mail)) {
-            mail = memberService.getMemberUserEmail(userId);
-        }
-        // 执行发送
-        return sendSingleMail(mail, userId, UserTypeEnum.MEMBER.getValue(), templateCode, templateParams);
-    }
-
-    @Override
-    public Long sendSingleMail(String mail, Long userId, Integer userType,
+    public Long sendSingleMail(String mail, Long userId,
                                String templateCode, Map<String, Object> templateParams) {
         // 校验邮箱模版是否合法
         MailTemplateDO template = validateMailTemplate(templateCode);
@@ -89,7 +60,7 @@ public class MailSendServiceImpl implements MailSendService {
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus());
         String title = mailTemplateService.formatMailTemplateContent(template.getTitle(), templateParams);
         String content = mailTemplateService.formatMailTemplateContent(template.getContent(), templateParams);
-        Long sendLogId = mailLogService.createMailLog(userId, userType, mail,
+        Long sendLogId = mailLogService.createMailLog(userId, mail,
                 account, template, content, templateParams, isSend);
         // 发送 MQ 消息，异步执行发送短信
         if (isSend) {
@@ -103,7 +74,7 @@ public class MailSendServiceImpl implements MailSendService {
     public void doSendMail(MailSendMessage message) {
         // 1. 创建发送账号
         MailAccountDO account = validateMailAccount(message.getAccountId());
-        MailAccount mailAccount  = buildMailAccount(account, message.getNickname());
+        MailAccount mailAccount = buildMailAccount(account, message.getNickname());
         // 2. 发送邮件
         try {
             String messageId = MailUtil.send(mailAccount, message.getMail(),
@@ -157,7 +128,7 @@ public class MailSendServiceImpl implements MailSendService {
     /**
      * 校验邮件参数是否确实
      *
-     * @param template 邮箱模板
+     * @param template       邮箱模板
      * @param templateParams 参数列表
      */
     @VisibleForTesting

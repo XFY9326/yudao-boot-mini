@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.controller.admin.captcha;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
@@ -24,10 +23,19 @@ public class CaptchaController {
     @Resource
     private CaptchaService captchaService;
 
+    public static String getRemoteId(HttpServletRequest request) {
+        String ip = ServletUtils.getClientIP(request);
+        String ua = request.getHeader("user-agent");
+        if (StrUtil.isNotBlank(ip)) {
+            return ip + ua;
+        }
+        return request.getRemoteAddr() + ua;
+    }
+
     @PostMapping({"/get"})
     @Operation(summary = "获得验证码")
     @PermitAll
-    @TenantIgnore
+
     public ResponseModel get(@RequestBody CaptchaVO data, HttpServletRequest request) {
         assert request.getRemoteHost() != null;
         data.setBrowserInfo(getRemoteId(request));
@@ -37,19 +45,10 @@ public class CaptchaController {
     @PostMapping("/check")
     @Operation(summary = "校验验证码")
     @PermitAll
-    @TenantIgnore
+
     public ResponseModel check(@RequestBody CaptchaVO data, HttpServletRequest request) {
         data.setBrowserInfo(getRemoteId(request));
         return captchaService.check(data);
-    }
-
-    public static String getRemoteId(HttpServletRequest request) {
-        String ip = ServletUtils.getClientIP(request);
-        String ua = request.getHeader("user-agent");
-        if (StrUtil.isNotBlank(ip)) {
-            return ip + ua;
-        }
-        return request.getRemoteAddr() + ua;
     }
 
 }

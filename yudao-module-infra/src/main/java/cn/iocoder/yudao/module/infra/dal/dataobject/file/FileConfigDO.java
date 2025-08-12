@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.infra.dal.dataobject.file;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClientConfig;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.db.DBFileClientConfig;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.ftp.FtpFileClientConfig;
@@ -33,7 +32,6 @@ import java.lang.reflect.Field;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TenantIgnore
 public class FileConfigDO extends BaseDO {
 
     /**
@@ -46,7 +44,7 @@ public class FileConfigDO extends BaseDO {
     private String name;
     /**
      * 存储器
-     *
+     * <p>
      * 枚举 {@link FileStorageEnum}
      */
     private Integer storage;
@@ -56,7 +54,7 @@ public class FileConfigDO extends BaseDO {
     private String remark;
     /**
      * 是否为主配置
-     *
+     * <p>
      * 由于我们可以配置多个文件配置，默认情况下，使用主配置进行文件的上传
      */
     private Boolean master;

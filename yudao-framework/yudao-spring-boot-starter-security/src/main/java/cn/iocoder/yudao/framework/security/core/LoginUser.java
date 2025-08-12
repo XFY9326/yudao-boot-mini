@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.security.core;
 
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -26,19 +25,9 @@ public class LoginUser {
      */
     private Long id;
     /**
-     * 用户类型
-     *
-     * 关联 {@link UserTypeEnum}
-     */
-    private Integer userType;
-    /**
      * 额外的用户信息
      */
     private Map<String, String> info;
-    /**
-     * 租户编号
-     */
-    private Long tenantId;
     /**
      * 授权范围
      */
@@ -51,15 +40,11 @@ public class LoginUser {
     // ========== 上下文 ==========
     /**
      * 上下文字段，不进行持久化
-     *
+     * <p>
      * 1. 用于基于 LoginUser 维度的临时缓存
      */
     @JsonIgnore
     private Map<String, Object> context;
-    /**
-     * 访问的租户编号
-     */
-    private Long visitTenantId;
 
     public void setContext(String key, Object value) {
         if (context == null) {

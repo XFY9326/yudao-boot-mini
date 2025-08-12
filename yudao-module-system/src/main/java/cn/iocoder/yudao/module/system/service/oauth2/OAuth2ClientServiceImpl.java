@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2Cl
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2ClientMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
+import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
@@ -58,6 +60,16 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
         // 校验 Client 未被占用
         validateClientIdExists(updateReqVO.getId(), updateReqVO.getClientId());
 
+        // 禁止修改默认客户端ClientId与状态
+        if (updateReqVO.getId() == OAuth2ClientConstants.ID_DEFAULT &&
+                !Objects.equals(updateReqVO.getClientId(), OAuth2ClientConstants.CLIENT_ID_DEFAULT)) {
+            throw exception(OAUTH2_CLIENT_DEFAULT_KEEP);
+        }
+        if (updateReqVO.getId() == OAuth2ClientConstants.ID_DEFAULT &&
+                CommonStatusEnum.isDisable(updateReqVO.getStatus())) {
+            throw exception(OAUTH2_CLIENT_DEFAULT_KEEP);
+        }
+
         // 更新
         OAuth2ClientDO updateObj = BeanUtils.toBean(updateReqVO, OAuth2ClientDO.class);
         oauth2ClientMapper.updateById(updateObj);
@@ -67,6 +79,10 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
     @CacheEvict(cacheNames = RedisKeyConstants.OAUTH_CLIENT,
             allEntries = true) // allEntries 清空所有缓存，因为 id 不是直接的缓存 key，不好清理
     public void deleteOAuth2Client(Long id) {
+        // 禁止修改默认客户端
+        if (id == OAuth2ClientConstants.ID_DEFAULT) {
+            throw exception(OAUTH2_CLIENT_DEFAULT_KEEP);
+        }
         // 校验存在
         validateOAuth2ClientExists(id);
         // 删除
@@ -77,6 +93,9 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
     @CacheEvict(cacheNames = RedisKeyConstants.OAUTH_CLIENT,
             allEntries = true) // allEntries 清空所有缓存，因为 id 不是直接的缓存 key，不好清理
     public void deleteOAuth2ClientList(List<Long> ids) {
+        if (ids.contains(OAuth2ClientConstants.ID_DEFAULT)) {
+            throw exception(OAUTH2_CLIENT_DEFAULT_KEEP);
+        }
         oauth2ClientMapper.deleteByIds(ids);
     }
 

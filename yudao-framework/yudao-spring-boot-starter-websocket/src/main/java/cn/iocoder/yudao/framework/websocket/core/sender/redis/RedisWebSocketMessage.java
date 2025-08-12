@@ -14,10 +14,6 @@ public class RedisWebSocketMessage extends AbstractRedisChannelMessage {
      */
     private String sessionId;
     /**
-     * 用户类型
-     */
-    private Integer userType;
-    /**
      * 用户编号
      */
     private Long userId;

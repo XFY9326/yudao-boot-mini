@@ -6,9 +6,6 @@ package cn.iocoder.yudao.module.infra.enums;
  * @author 芋道源码
  */
 public interface DictTypeConstants {
-
-    String USER_TYPE = "user_type"; // 用户类型
-
     String JOB_STATUS = "infra_job_status"; // 定时任务状态的枚举
     String JOB_LOG_STATUS = "infra_job_log_status"; // 定时任务日志状态的枚举
 
@@ -18,5 +15,4 @@ public interface DictTypeConstants {
     String BOOLEAN_STRING = "infra_boolean_string"; // Boolean 是否类型
 
     String OPERATE_TYPE = "infra_operate_type"; // 操作类型
-
 }
